@@ -1,0 +1,292 @@
+<ESLint>
+ESLint is a static code analysis tool for identifying and fixing problems in JavaScript and TypeScript code. It is widely used in web development projects to ensure code quality, maintainability, and adherence to coding standards. ESLint analyzes your code based on a set of rules and provides feedback on potential issues, coding style violations, and possible improvements.
+
+<Testing>
+Your test should always help you with your refatoring, if user have the good result your tests should broken
+
+When you test, test the public interface or the public API of your components
+
+plus vos tests ressemblent à la façon dont votre logiciel est utilisé, plus ils peuvent vous donner confiance
+
+This website to test in realtime your screen
+https://testing-playground.com/
+
+
+it.todo = in draft, and also Todo must be called with only a description.
+
+beforeEach(() => {}) : run this test before each tests in the block describe
+
+The text description of a series of tests need to be like a story a scenarion
+
+
+describe(): The purpose of using describe() is to provide a clear structure to your tests, 
+making it easier to understand the organization and purpose of each block of tests. 
+It's especially helpful in larger test suites with multiple components and test cases. 
+The descriptions within describe() provide context and make the test output more readable when tests are run.
+Aussi describe nous facilite le travaille pour faire le refactorisation du code
+
+
+findBy:
+In React Testing Library, findBy is a set of asynchronous versions of the query functions. 
+They are used to find elements that are expected to appear asynchronously, 
+for example, due to an asynchronous operation like "data fetching" or "state updates".
+
+Here's the general pattern for using findBy:
+
+import { render, screen } from '@testing-library/react';
+import YourComponent from './YourComponent'; // Replace with the correct path
+
+test('example test with findBy', async () => {
+  render(<YourComponent />);
+
+  // Use findBy to wait for an element to appear asynchronously
+  const asyncElement = await screen.findByRole('your-role');
+
+  // Assertions or further testing logic with the found element
+});
+
+Asynchronous Nature: The findBy queries are asynchronous, and they return promises. 
+They wait for the specified condition to be satisfied, which is useful when testing components that fetch data or update asynchronously.
+
+Make sure to use await when calling findBy to wait for the promise to resolve.
+
+Error Handling: If the element is not found within the specified timeout (default is 4500ms), the test will fail with a timeout error. 
+You can adjust the timeout by passing an options object as the second parameter 
+(e.g., await screen.findByRole('your-role', { timeout: 3000 })).
+
+Here are some examples of findBy queries:
+
+findByText
+findByRole
+findByLabelText
+findByPlaceholderText
+findByAltText
+findByDisplayValue
+
+These queries work similarly to their synchronous counterparts (getByText, getByRole, etc.) but return promises, 
+allowing you to work with asynchronous scenarios in your tests.
+
+
+Exemple of fitching data:
+import React from 'react';
+import { render, screen } from '@testing-library/react';
+import YourAsyncComponent from './YourAsyncComponent';
+
+test('renders data asynchronously', async () => {
+  render(<YourAsyncComponent />);
+
+  // No need to await, the loading text should be present in the initial render
+  const asyncTextElement = screen.getByText('Loading...');
+
+  // Assert that the loading text is present before the data
+  expect(asyncTextElement).toBeInTheDocument();
+
+  // Use findByText to wait for the data text to appear asynchronously
+  const dataTextElement = await screen.findByText('Your Data Message');
+
+  // Assert that the data text is present after the loading text disappears
+  expect(dataTextElement).toBeInTheDocument();
+});
+
+Another Example:
+const button = screen.getByRole('button', {name: 'Click Me'})
+fireEvent.click(button)
+await screen.findByText('Clicked once')
+fireEvent.click(button)
+await screen.findByText('Clicked twice')
+
+
+fit(): to focuse only in one test per example thers is a problem on this test we run only this one and the others will be skipped
+
+act(() => {}): 
+When testing, code that causes React state updates should be wrapped into act(...): 
+pour assurer que le test ne vas pas continue jusqua le state change 
+
+In this example, act is used to wrap the interaction with the component (clicking the button). 
+This ensures that any state updates or side effects caused by the interaction are processed synchronously before moving on to the assertion.
+
+
+queryBy()
+The queryBy function allows you to query for elements using a custom function. 
+It takes a function as an argument and returns the first element that satisfies the provided function. 
+If no element is found, it returns null.
+
+Here's a simple example:
+import { render, screen } from '@testing-library/react';
+import MyComponent from './MyComponent';
+
+test('example test', () => {
+  render(<MyComponent />);
+
+  // Assume MyComponent renders a list of items
+  const firstListItem = screen.queryByText('First Item');
+
+  expect(firstListItem).toBeInTheDocument();
+});
+
+queryByText is used to find the first element that contains the text content 'First Item'. if not it return null
+
+La deference entre queryByText et getByText est: 
+que la premiere return null si il ne trouve pas l'element dans le document et la deuxieme declenche une erreur dans le console
+
+On utilise queryByText pour avoir une valeur avec laquelle on va faire un autre test si il exsite et autre c'est il est null
+
+
+
+waitForElementToBeRemoved: allows you to wait for an element to be removed from the DOM
+EX: await waitForElementToBeRemoved(() => screen.queryByText("Loading..."), { timeout: 2000 })
+// Ici c-a-d que le "Laoding..." deja été affiché et apres est disparu, 
+// Alors ce n'est pas necessaire de verifier si "Loading..." existe et apres est disparu
+
+
+<spyOn>
+spyOn is a Jest function that allows you to spy on the behavior of a function, method, or object. 
+When you spy on a function, you can track calls to that function and modify its behavior during testing.
+
+ is particularly useful in scenarios where you want to:
+
+Track method calls: 
+You can use jest.spyOn() to track how many times a specific method is called, with what arguments, and what it returns. 
+This is beneficial when you want to ensure that certain methods are called in the expected manner.
+
+Avoid real method execution: 
+When testing, you might want to replace a method's actual implementation with a mock or a stub to isolate the code you are testing. 
+This prevents unintended side effects during the test.
+
+Test callbacks or event handlers: 
+If you have methods that act as callbacks or event handlers, 
+jest.spyOn() allows you to spy on these methods to ensure they are triggered as expected.
+
+
+In real scenarios, you might use jest.spyOn() when you want to ensure that certain methods are called with specific arguments 
+or when you need to replace real method behavior with a mock for testing purposes.
+
+
+
+<Jest.fn() VS jest.spyOn()>
+1.Creation of Mock Functions:
+jest.fn(): This is primarily used to create standalone mock functions. You define the behavior of the mock function using 
+mockReturnValue, mockResolvedValue, etc.
+
+jest.spyOn(): This is used to spy on existing methods of objects. It creates a mock function that wraps around the original method, 
+allowing you to track calls and modify behavior if needed.
+
+2.Usage:
+jest.fn(): You would use this when you want to create a standalone mock function, 
+often to replace a function in your code during testing.
+
+jest.spyOn(): You use this when you want to spy on the behavior of an existing method, 
+typically of an object or class instance.
+
+
+3.Object Association:
+jest.fn(): The mock function is not associated with any particular object or class. It's a standalone mock
+jest.spyOn(): It is used to spy on methods of a specific object or class instance.
+
+Here's a quick example to illustrate the difference:
+
+class MathOperations {
+  add(a, b) {
+    return a + b;
+  }
+}
+
+// Using jest.fn() to create a standalone mock function
+const standaloneMock = jest.fn().mockReturnValue(42);
+console.log(standaloneMock()); // Outputs: 42
+
+// Using jest.spyOn() to spy on an existing method
+const mathInstance = new MathOperations();
+const spyAdd = jest.spyOn(mathInstance, 'add').mockReturnValue(99); //  So, whenever add is called, it will now return 99
+console.log(mathInstance.add(2, 3)); // Outputs: 99 // When we call mathInstance.add(2, 3), it's not actually performing the addition operation because we've spied on it and modified its behavior. Instead, it returns the value we specified with mockReturnValue(99). So, the output of this line is 99, not the result of adding 2 and 3.
+
+
+// Assertions
+expect(standaloneMock).toHaveBeenCalled();
+expect(spyAdd).toHaveBeenCalledWith(2, 3);
+
+
+
+here is a simple example: (We create a mock function using jest.fn().)
+
+<1>
+  import { render, screen } from '@testing-library/react';
+  import user from '@testing-library/user-event';
+  import MyComponent from './MyComponent';
+
+  test('it should call a function when a button is clicked', () => {
+    const mockFunction = jest.fn();
+
+    render(<MyComponent onClick={mockFunction} />);
+
+    const button = screen.getByRole('button');
+    user.click(button);
+
+    expect(mockFunction).toHaveBeenCalled();
+  });
+
+<2>
+const mockFunction = jest.fn().mockReturnValue('mockedValue');
+
+// Now, when you call the mock function, it will always return 'mockedValue'
+const result = mockFunction();
+expect(result).toBe('mockedValue');
+
+
+mockReturnValue VS mockResolvedValue:
+
+1.mockReturnValue:
+- Used for synchronous functions.
+- It sets the return value for the mock function, regardless of whether the original function is synchronous or asynchronous.
+- Suitable for functions that return values immediately without involving Promises or asynchronous operations.
+Exemple:
+const mockFunction = jest.fn().mockReturnValue('mockedValue');
+const result = mockFunction();
+console.log(result); // Outputs: 'mockedValue'
+
+2.mockResolvedValue:
+- Specifically designed for mocking functions that return Promises or are asynchronous.
+- It sets the resolved value of the Promise returned by the mock function.
+- Suitable for functions that involve asynchronous operations, such as fetching data or handling async/await.
+Exemple:
+const mockAsyncFunction = jest.fn().mockResolvedValue('mockedAsyncValue');
+mockAsyncFunction().then(result => console.log(result)); // Outputs: 'mockedAsyncValue'
+
+
+
+
+jest.mock() :
+is a Jest feature used for automatically mocking or replacing modules or dependencies in your code during testing
+
+Here's a basic overview of how jest.mock() works:
+1.Automatic Mocking:
+When you use jest.mock('moduleName'), Jest automatically replaces the actual module with a mock implementation.
+This is useful when you want to isolate the module you are testing and replace its dependencies with mock versions.
+
+2.Manual Mocks:
+You can provide a manual mock implementation by creating a __mocks__ directory adjacent to the module you are mocking. 
+Jest will use these manual mocks if they exist.
+For example, if you are mocking a module named axios, you can create a manual mock at __mocks__/axios.js
+
+3.Mocking with Custom Implementations:
+You can provide a custom implementation for the mocked module by passing a function or an object to jest.mock().
+This allows you to define how the mocked module behaves during tests.
+
+
+userEvent.keyboard("{escape}"):
+userEvent.keyboard("{escape}") simulates pressing the "Escape" key. 
+This can be useful when you want to test how your application responds to keyboard events, 
+such as closing a modal or canceling an action.
+
+In each test case, we use axios.get.mockResolvedValue or axios.get.mockRejectedValue 
+to control the behavior of the axios.get method during the test.
+
+screen.debug(); pour faire debugger le screen et voir le render du composant
+
+
+
+<MSW for testing>
+npm install --save-dev msw whatwg-fetch
+
+
+__mocks__:
