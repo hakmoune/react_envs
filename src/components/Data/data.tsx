@@ -11,11 +11,17 @@ export const ApiCall: React.FC = () => {
 
     console.log("console", process.env.REACT_APP_API_BASE_URL)
 
+    //AXIOS BASE URL/////////////////////////
+    const instance = axios.create({
+        baseURL: process.env.REACT_APP_API_BASE_URL,
+        // Additional configuration if needed
+    });
+
     //AXIOS/////////////////////////
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/products`)
+                const response = await instance.get(`/products`)
                 setDataAxios(response.data)
             } catch (error) {
                 console.error('Error fetching data:', error)
@@ -27,7 +33,7 @@ export const ApiCall: React.FC = () => {
     //AXIOS/////////////////////////
     const handleDeleteAxios = async (id: number) => {
         try {
-            const response = await axios.delete(`https://dummyjson.com/products/${id}`)
+            const response = await instance.delete(`/products/${id}`)
             if (response.status === 200) {
                 setDataAxios(prevData => ({
                     //"!": It's a way of telling TypeScript, "I know this might be null, but I'm sure it's not, so treat it as non-null."
@@ -46,8 +52,8 @@ export const ApiCall: React.FC = () => {
     //AXIOS/////////////////////////
     const handleUpdateAxios = async (id: number) => {
         try {
-            const response = await axios.patch(
-                `https://dummyjson.com/products/${id}`,
+            const response = await instance.patch(
+                `/products/${id}`,
                 { title: inputRef.current[id] },
                 { headers: { 'Content-Type': 'application/json' } }
             )
@@ -70,8 +76,8 @@ export const ApiCall: React.FC = () => {
     //AXIOS/////////////////////////
     const handleAddAxios = async () => {
         try {
-            const response = await axios.post(
-                `https://dummyjson.com/products/add`,
+            const response = await instance.post(
+                `/products/add`,
                 { title: inputRef.current['addAxios'] },
                 { headers: { 'Content-Type': 'application/json' } }
             )

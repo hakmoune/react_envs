@@ -138,6 +138,11 @@ One significant rule when using environment variables is to never commit your .e
 6 Manifest
 
 
+# ChatGPT
 
+1. `.env.local` or `.env` for Local Development: `REACT_APP_API_URL=http://localhost:3000`
+2. `.env.development` for Azure Development Environment: `REACT_APP_API_URL=https://dev-api.example.com`
+3. `.env.staging` for Azure Preproduction Environment: `REACT_APP_API_URL=https://preprod-api.example.com`
+4. `.env.production` for Azure Production Environment: `REACT_APP_API_URL=https://prod-api.example.com`
 
-
+When you move to another environment, you typically trigger a build for that specific environment, and during the build process, you choose the right .env file.
